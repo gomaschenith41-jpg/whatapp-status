@@ -57,6 +57,44 @@ function openVideo(videoId) {
     videoPlayer.src = embedUrl;
     videoModal.style.display = "block";
 }
+// ඉහළ ඇති අනෙකුත් Variables එලෙසම තබන්න
+let currentVideoUrl = ""; // Share කිරීමට අවශ්‍ය URL එක ගබඩා කිරීමට
+
+const shareBtn = document.getElementById('shareBtn');
+
+function openVideo(videoId) {
+    const origin = window.location.origin;
+    currentVideoUrl = `https://www.youtube.com/watch?v=${videoId}`; // මුල් වීඩියෝ ලින්ක් එක
+
+    // controls=0 මගින් ප්ලේයර් එකේ බටන් සහ ලෝගෝ අවම කරයි
+    // modestbranding=1 මගින් YouTube ලෝගෝ එක හැකිතාක් සඟවයි
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&controls=0&modestbranding=1&rel=0&showinfo=0&iv_load_policy=3&origin=${origin}`;
+    
+    videoPlayer.src = embedUrl;
+    videoModal.style.display = "block";
+}
+
+// Share කිරීමේ ක්‍රියාවලිය
+shareBtn.onclick = () => {
+    if (navigator.share) {
+        // Mobile Phone වල Share Menu එක Open වේ
+        navigator.share({
+            title: 'Spart World Video',
+            text: 'බලන්න මේ වීඩියෝ එක!',
+            url: currentVideoUrl,
+        }).catch((error) => console.log('Error sharing', error));
+    } else {
+        // Desktop වලදී WhatsApp Web හරහා Share වේ
+        const whatsappUrl = `https://api.whatsapp.com/send?text=බලන්න මේ වීඩියෝ එක: ${currentVideoUrl}`;
+        window.open(whatsappUrl, '_blank');
+    }
+}
+
+// Modal Close වන විට වීඩියෝව Stop කිරීමට අමතක කරන්න එපා
+closeBtn.onclick = () => {
+    videoModal.style.display = "none";
+    videoPlayer.src = "";
+}
 
 closeBtn.onclick = () => {
     videoModal.style.display = "none";
