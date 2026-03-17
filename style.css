@@ -88,3 +88,25 @@ header h1 {
     font-weight: bold;
     cursor: pointer;
 }
+.share-section {
+    text-align: center;
+    padding: 15px;
+    background: #1e1e1e;
+}
+
+.share-btn {
+    background-color: #25d366; /* WhatsApp Green */
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 5px;
+    font-weight: bold;
+    cursor: pointer;
+    font-size: 16px;
+    transition: 0.3s;
+}
+
+.share-btn:hover {
+    background-color: #128c7e;
+    transform: scale(1.05);
+}
