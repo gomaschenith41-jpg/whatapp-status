@@ -1,5 +1,5 @@
-const API_KEY = 'AIzaSyBTDUosPUGMI6pFHXz_VDLFkv-BPI4_eKI'; // ඔබේ API Key එක මෙතැනට දමන්න
-const CHANNEL_HANDLE = '@spartworld'; // ඔබට අවශ්‍ය චැනල් එකේ Handle එක
+const API_KEY = 'AIzaSyBTDUosPUGMI6pFHXz_VDLFkv-BPI4_eKI'; 
+const CHANNEL_HANDLE = '@spartworld'; 
 const MAX_RESULTS = 20;
 
 const videoGrid = document.getElementById('video-grid');
@@ -9,36 +9,21 @@ const closeBtn = document.querySelector('.close-btn');
 
 async function fetchVideos() {
     try {
-        // පියවර 1: Handle එක භාවිතා කර චැනල් එකේ Upload Playlist ID එක ලබා ගැනීම
         const channelUrl = `https://www.googleapis.com/youtube/v3/channels?part=contentDetails&forHandle=${CHANNEL_HANDLE}&key=${API_KEY}`;
         const channelResponse = await fetch(channelUrl);
         const channelData = await channelResponse.json();
 
-        if (channelData.error) {
-            throw new Error(channelData.error.message);
-        }
-
-        if (!channelData.items || channelData.items.length === 0) {
-            videoGrid.innerHTML = "<p style='color:yellow;'>චැනල් එක හමු වූයේ නැත. Handle එක (@spartworld) නිවැරදි දැයි බලන්න.</p>";
-            return;
-        }
+        if (channelData.error) throw new Error(channelData.error.message);
 
         const uploadsPlaylistId = channelData.items[0].contentDetails.relatedPlaylists.uploads;
 
-        // පියවර 2: ලබාගත් Playlist ID එක භාවිතා කර වීඩියෝ 20 ලබා ගැනීම
         const playlistUrl = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=${MAX_RESULTS}&playlistId=${uploadsPlaylistId}&key=${API_KEY}`;
         const playlistResponse = await fetch(playlistUrl);
         const playlistData = await playlistResponse.json();
 
-        if (playlistData.items && playlistData.items.length > 0) {
-            displayVideos(playlistData.items);
-        } else {
-            videoGrid.innerHTML = "<p>මෙම චැනල් එකේ වීඩියෝ කිසිවක් නැත.</p>";
-        }
-
+        displayVideos(playlistData.items);
     } catch (error) {
-        console.error("Error:", error);
-        videoGrid.innerHTML = `<p style="color:red;">දෝෂයක් සිදු විය: ${error.message}</p>`;
+        videoGrid.innerHTML = `<p style="color:red;">Error: ${error.message}</p>`;
     }
 }
 
@@ -55,23 +40,27 @@ function displayVideos(items) {
             <img src="${thumbnail}" alt="${title}">
             <h3>${title}</h3>
         `;
+        // User ක්ලික් කළ විට වීඩියෝව විවෘත වේ
         videoCard.onclick = () => openVideo(videoId);
         videoGrid.appendChild(videoCard);
     });
 }
 
 function openVideo(videoId) {
-    // වීඩියෝව ප්ලේ වන වත්මන් වෙබ් අඩවියේ ලිපිනය (Domain) ලබා ගැනීම
+    // 1. වත්මන් වෙබ් අඩවියේ Domain එක ලබා ගන්න (GitHub ලිපිනය)
     const origin = window.location.origin;
 
-    // Error 153 මඟහරවා ගැනීමට origin සහ enablejsapi පරාමිතීන් එකතු කිරීම
-    videoPlayer.src = `https://www.youtube.com/embed/${videoId}?autoplay=1&origin=${origin}&enablejsapi=1`;
+    // 2. Autoplay=1 සහ Mute=0 ලෙස ලබා දෙන්න. 
+    // පරිශීලකයා thumbnail එක click කරන නිසා Browser එක autoplay වලට ඉඩ දෙයි.
+    const embedUrl = `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=0&rel=0&origin=${origin}&enablejsapi=1`;
     
+    videoPlayer.src = embedUrl;
     videoModal.style.display = "block";
 }
+
 closeBtn.onclick = () => {
     videoModal.style.display = "none";
-    videoPlayer.src = "";
+    videoPlayer.src = ""; // Modal එක වසන විට වීඩියෝව නැවතීමට
 }
 
 window.onclick = (event) => {
